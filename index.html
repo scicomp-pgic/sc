@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="gate-pending">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -1028,6 +1028,9 @@
     .home__side { position: static; }
   }
   /* ---------- Drive link below info card ---------- */
+  .drive-link--wide {
+    margin-bottom: 40px;
+  }
   .drive-link {
     display: flex;
     align-items: center;
@@ -1091,6 +1094,146 @@
   .reveal-stagger.is-in > *:nth-child(4) { transition-delay: 240ms; }
   .reveal-stagger.is-in > *:nth-child(5) { transition-delay: 320ms; }
   .reveal-stagger.is-in > *:nth-child(6) { transition-delay: 400ms; }
+
+  /* ---------- Access gate ---------- */
+  /* When the body is locked, hide gated sections + their nav links */
+  body.is-locked .gated { display: none !important; }
+  body.is-locked .nav-gated { display: none; }
+  /* When unlocked, hide the gate prompt entirely */
+  body.is-locked #gate { display: block; }
+  body:not(.is-locked) #gate { display: none; }
+  /* Before JS decides, hide gated content to avoid a flash of protected material */
+  .gated { }
+  html.gate-pending .gated { display: none !important; }
+  html.gate-pending .nav-gated { display: none; }
+
+  .gate {
+    padding-block: clamp(56px, 9vw, 110px);
+    border-top: 1px solid var(--line);
+    background:
+      radial-gradient(120% 80% at 50% 0%, var(--burgundy-tint) 0%, transparent 60%),
+      var(--paper);
+  }
+  .gate__wrap {
+    max-width: 560px;
+    margin: 0 auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .gate__icon {
+    width: 56px; height: 56px;
+    display: grid; place-items: center;
+    color: var(--burgundy);
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    margin-bottom: 22px;
+    box-shadow: 0 12px 30px -18px rgba(128,0,32,0.5);
+  }
+  .gate__icon svg { width: 26px; height: 26px; }
+  .gate__eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--burgundy);
+    margin: 0 0 14px;
+  }
+  .gate__title {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(24px, 3.4vw, 34px);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    margin: 0 0 14px;
+    text-wrap: balance;
+  }
+  .gate__sub {
+    color: var(--ink-3);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0 0 30px;
+    max-width: 46ch;
+  }
+  .gate__form {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    max-width: 460px;
+  }
+  .gate__input {
+    flex: 1;
+    min-width: 0;
+    font-family: var(--sans);
+    font-size: 15px;
+    padding: 14px 16px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    background: #fff;
+    color: var(--ink);
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .gate__input:focus {
+    outline: none;
+    border-color: var(--burgundy);
+    box-shadow: 0 0 0 3px var(--burgundy-tint);
+  }
+  .gate__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 20px;
+    border: 1px solid var(--burgundy);
+    background: var(--burgundy);
+    color: #fff;
+    border-radius: var(--radius);
+    font-size: 14.5px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background .2s, transform .15s, box-shadow .2s;
+  }
+  .gate__btn:hover {
+    background: var(--burgundy-deep);
+    border-color: var(--burgundy-deep);
+    box-shadow: 0 12px 28px -16px rgba(128,0,32,0.6);
+  }
+  .gate__btn:active { transform: translateY(1px); }
+  .gate__btn svg { transition: transform .2s; }
+  .gate__btn:hover svg { transform: translateX(3px); }
+  .gate__msg {
+    min-height: 22px;
+    margin: 16px 0 0;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .gate__msg.is-error { color: var(--burgundy); }
+  .gate__msg.is-ok { color: #2a6f3f; }
+  .gate__hint {
+    margin: 26px 0 0;
+    font-size: 13px;
+    color: var(--ink-4);
+    line-height: 1.5;
+    max-width: 40ch;
+  }
+  @media (max-width: 520px) {
+    .gate__form { flex-direction: column; }
+    .gate__btn { justify-content: center; }
+  }
+  /* Tiny lock chip in the nav while locked */
+  .nav__lock {
+    display: none;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-4);
+  }
+  body.is-locked .nav__lock { display: inline-flex; }
+  .nav__lock svg { width: 13px; height: 13px; color: var(--burgundy); }
 
   /* ---------- Scroll progress ---------- */
   .scroll-progress {
@@ -1158,12 +1301,16 @@
 <nav class="nav" id="nav" aria-label="Primary">
   <div class="wrap nav__inner">
     <a href="#home" class="nav__brand" aria-label="Home"></a>
+    <span class="nav__lock" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10.5" width="16" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>
+      Locked
+    </span>
     <ul class="nav__list" id="navList">
       <li><a href="#home">Home</a></li>
-      <li><a href="#exercises">Exercises</a></li>
-      <li><a href="#announcements">Announcements</a></li>
-      <li><a href="#bibliography">Bibliography</a></li>
-      <li><a href="#contact">Contact</a></li>
+      <li class="nav-gated"><a href="#exercises">Exercises</a></li>
+      <li class="nav-gated"><a href="#announcements">Announcements</a></li>
+      <li class="nav-gated"><a href="#bibliography">Bibliography</a></li>
+      <li class="nav-gated"><a href="#contact">Contact</a></li>
     </ul>
     <button class="nav__toggle" id="navToggle" aria-label="Toggle navigation" aria-expanded="false">
       <span aria-hidden="true"></span>
@@ -1224,35 +1371,67 @@
           </div>
         </dl>
       </aside>
-
-      <a class="drive-link reveal" href="https://drive.google.com/drive/folders/1JU1vDX1ziK1pS-JVmJm1GuxlLdMj7hqy?usp=sharing" target="_blank" rel="noopener" aria-label="Open course Google Drive">
-        <span class="drive-link__icon" aria-hidden="true">
-          <svg viewBox="0 0 87 76" width="22" height="19">
-            <path fill="#1FA463" d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3L27.5 53H0c0 1.55.4 3.1 1.2 4.5l5.4 9.35z"/>
-            <path fill="#4285F4" d="M43.65 25 29.9 1.2C28.55 2 27.4 3.1 26.6 4.5L1.2 48.5C.4 49.9 0 51.45 0 53h27.5L43.65 25z"/>
-            <path fill="#FFCD40" d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.5l5.85 11.5 7.9 12.3z"/>
-            <path fill="#1A73E8" d="M43.65 25 57.4 1.2C56.05.4 54.5 0 52.9 0H34.4c-1.6 0-3.15.45-4.5 1.2L43.65 25z"/>
-            <path fill="#EA4335" d="M59.8 53H27.5L13.75 76.8c1.35.8 2.9 1.2 4.5 1.2h50.55c1.6 0 3.15-.45 4.5-1.2L59.8 53z"/>
-            <path fill="#188038" d="M73.4 26.5 60.7 4.5c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25 59.8 53h27.45c0-1.55-.4-3.1-1.2-4.5L73.4 26.5z"/>
-          </svg>
-        </span>
-        <span class="drive-link__txt">
-          <span class="drive-link__lbl">Course materials</span>
-          <span class="drive-link__name">Google Drive folder</span>
-        </span>
-        <span class="drive-link__arrow" aria-hidden="true">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg>
-        </span>
-      </a>
       </div>
     </div>
 
   </div>
 </section>
 
+<!-- ACCESS GATE — shown only to non-students -->
+<section id="gate" class="gate" aria-label="Student access">
+  <div class="wrap gate__wrap">
+    <div class="gate__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="4" y="10.5" width="16" height="10" rx="2"/>
+        <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/>
+        <circle cx="12" cy="15.5" r="1.4" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <p class="gate__eyebrow">Enrolled students only</p>
+
+    <form class="gate__form" id="gateForm" autocomplete="off">
+      <input
+        type="email"
+        id="gateEmail"
+        class="gate__input"
+        placeholder="your.email@example.com"
+        aria-label="Course email"
+        required
+        spellcheck="false"
+      />
+      <button type="submit" class="gate__btn">
+        Unlock access
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </form>
+    <p class="gate__msg" id="gateMsg" role="status" aria-live="polite"></p>
+    <p class="gate__hint">Trouble getting in? Write to the instructors — their contact is shared with the class.</p>
+  </div>
+</section>
+
 <!-- 2. EXERCISES -->
-<section id="exercises">
+<section id="exercises" class="gated">
   <div class="wrap">
+
+    <a class="drive-link drive-link--wide reveal" href="https://drive.google.com/drive/folders/1JU1vDX1ziK1pS-JVmJm1GuxlLdMj7hqy?usp=sharing" target="_blank" rel="noopener" aria-label="Open course Google Drive">
+      <span class="drive-link__icon" aria-hidden="true">
+        <svg viewBox="0 0 87 76" width="22" height="19">
+          <path fill="#1FA463" d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3L27.5 53H0c0 1.55.4 3.1 1.2 4.5l5.4 9.35z"/>
+          <path fill="#4285F4" d="M43.65 25 29.9 1.2C28.55 2 27.4 3.1 26.6 4.5L1.2 48.5C.4 49.9 0 51.45 0 53h27.5L43.65 25z"/>
+          <path fill="#FFCD40" d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.5l5.85 11.5 7.9 12.3z"/>
+          <path fill="#1A73E8" d="M43.65 25 57.4 1.2C56.05.4 54.5 0 52.9 0H34.4c-1.6 0-3.15.45-4.5 1.2L43.65 25z"/>
+          <path fill="#EA4335" d="M59.8 53H27.5L13.75 76.8c1.35.8 2.9 1.2 4.5 1.2h50.55c1.6 0 3.15-.45 4.5-1.2L59.8 53z"/>
+          <path fill="#188038" d="M73.4 26.5 60.7 4.5c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25 59.8 53h27.45c0-1.55-.4-3.1-1.2-4.5L73.4 26.5z"/>
+        </svg>
+      </span>
+      <span class="drive-link__txt">
+        <span class="drive-link__lbl">Course materials</span>
+        <span class="drive-link__name">Google Drive folder</span>
+      </span>
+      <span class="drive-link__arrow" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </span>
+    </a>
 
     <header class="sec-head reveal">
       <span class="sec-head__num">02</span>
@@ -1272,7 +1451,7 @@
 </section>
 
 <!-- 3. ANNOUNCEMENTS -->
-<section id="announcements">
+<section id="announcements" class="gated">
   <div class="wrap">
 
     <header class="sec-head reveal">
@@ -1291,7 +1470,7 @@
 </section>
 
 <!-- 4. BIBLIOGRAPHY -->
-<section id="bibliography">
+<section id="bibliography" class="gated">
   <div class="wrap">
 
     <header class="sec-head reveal">
@@ -1345,7 +1524,7 @@
 </section>
 
 <!-- 5. CONTACT -->
-<section id="contact" class="contact">
+<section id="contact" class="contact gated">
   <div class="wrap">
 
     <header class="sec-head reveal">
@@ -1467,6 +1646,113 @@
   }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
   document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => io.observe(el));
+
+  // ============================================================
+  //  ACCESS GATE  —  student-only sections
+  // ============================================================
+  //
+  //  HOW IT WORKS
+  //  ------------
+  //  • Student emails are stored below ONLY as SHA-256 hashes
+  //    (irreversible codes). The real emails never live in this file.
+  //  • A visitor types their email; we hash it the same way and
+  //    compare. A match unlocks Exercises / Announcements /
+  //    Bibliography / Contact and is remembered on this device.
+  //  • This is a convenience gate, not bank-grade security — keep the
+  //    actual files protected in the restricted Google Drive folder.
+  //
+  //  TO UPDATE THE STUDENT LIST
+  //  --------------------------
+  //  1. Open  generar-codigos.html  (in this project) in your browser.
+  //  2. Paste the student emails, one per line.
+  //  3. Copy the generated code block and replace the array below.
+  //
+  // ------------------------------------------------------------
+  const STUDENT_HASHES = [
+    // ↓↓↓ REEMPLAZÁ ESTOS DEMO POR TUS CÓDIGOS REALES ↓↓↓
+    // Estos dos son solo para probar — corresponden a:
+    //   "alumno@demo.com"  y  "test@demo.com"
+    "5245dc6fb201e5e80c5d472a1039bcbca547b6056c8441e0f8f1e6cbfb18911e", // alumno@demo.com
+    "b47463366daa5d01dbdf86e34947ea276a8fd90d20a2e7ba92195e9ef3b4de7b", // test@demo.com
+  ];
+  // ------------------------------------------------------------
+
+  const STORAGE_KEY = 'sc2026_access_ok';
+  const htmlEl = document.documentElement;
+  const bodyEl = document.body;
+
+  async function sha256(text) {
+    const data = new TextEncoder().encode(text);
+    const buf = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(buf))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+  }
+
+  function lock() {
+    htmlEl.classList.remove('gate-pending');
+    bodyEl.classList.add('is-locked');
+  }
+  function unlock(persist) {
+    htmlEl.classList.remove('gate-pending');
+    bodyEl.classList.remove('is-locked');
+    if (persist) {
+      try { localStorage.setItem(STORAGE_KEY, '1'); } catch (e) {}
+    }
+  }
+
+  // Decide initial state
+  let alreadyIn = false;
+  try { alreadyIn = localStorage.getItem(STORAGE_KEY) === '1'; } catch (e) {}
+  if (alreadyIn) {
+    unlock(false);
+  } else {
+    lock();
+  }
+
+  // Handle the form
+  const gateForm = document.getElementById('gateForm');
+  const gateEmail = document.getElementById('gateEmail');
+  const gateMsg = document.getElementById('gateMsg');
+
+  if (gateForm) {
+    gateForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const raw = (gateEmail.value || '').trim().toLowerCase();
+      if (!raw) return;
+
+      gateMsg.className = 'gate__msg';
+      gateMsg.textContent = 'Checking…';
+
+      let hash;
+      try {
+        hash = await sha256(raw);
+      } catch (err) {
+        gateMsg.className = 'gate__msg is-error';
+        gateMsg.textContent = 'This browser blocked the check. Open the site over https.';
+        return;
+      }
+
+      if (STUDENT_HASHES.includes(hash)) {
+        gateMsg.className = 'gate__msg is-ok';
+        gateMsg.textContent = 'Welcome — unlocking the course…';
+        setTimeout(() => {
+          unlock(true);
+          // re-run reveal observer for the now-visible sections
+          document.querySelectorAll('.gated .reveal, .gated .reveal-stagger')
+            .forEach(el => el.classList.add('is-in'));
+          const ex = document.getElementById('exercises');
+          if (ex) {
+            const top = ex.getBoundingClientRect().top + window.scrollY - 70;
+            window.scrollTo({ top, behavior: 'smooth' });
+          }
+        }, 550);
+      } else {
+        gateMsg.className = 'gate__msg is-error';
+        gateMsg.textContent = 'That email is not on the class list. Check the spelling, or contact the instructors.';
+      }
+    });
+  }
 </script>
 
 </body>
